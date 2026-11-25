@@ -1,0 +1,18 @@
+[Unit]
+Description=Pi Teletext Modulator - broadcast Level-1 TTI over PAL VBI
+After=systemd-udev-settle.service
+Wants=systemd-udev-settle.service
+ConditionPathExists=/dev/dri/card2
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/pi-teletext-modulator
+ExecStart=/bin/bash -o pipefail -c '/usr/bin/python3 -u /opt/pi-teletext-modulator/src/tti_stream.py /opt/pi-teletext-modulator/pages | /opt/pi-teletext-modulator/upstream/raspi5-teletext/teletext -'
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
