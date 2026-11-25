@@ -8,7 +8,7 @@ user="${SUDO_USER:-}"
 [[ -n "$user" && "$user" != root ]] || { echo "Run as: sudo bash scripts/setup-kiosk.sh (from the intended desktop user)" >&2; exit 1; }
 home="$(getent passwd "$user" | cut -d: -f6)"
 [[ -d "$home" ]] || { echo "Cannot find home directory for $user" >&2; exit 1; }
-if [[ "$user" == *['/&\\']* || "$home" == *['/&\\']* ]]; then
+if [[ ! "$user" =~ ^[a-z_][a-z0-9_-]*$ || "$home" == *['&|\\']* ]]; then
   echo "Unsupported username or home path characters" >&2
   exit 1
 fi
