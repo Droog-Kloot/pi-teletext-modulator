@@ -107,3 +107,40 @@ systemctl status virtual-display chromium-kiosk chromium-vnc chromium-novnc tele
 The next feature is integrating virtual X11 pixel capture into the PAL scanout framebuffer **without touching the VBI rows**. Until this is implemented and tested, Chromium is available only through noVNC.
 
 **Security:** noVNC and x11vnc are deliberately bound to 127.0.0.1; do not remove loopback binding without adding authentication and TLS. The Xvfb virtual display is local to the Pi.
+
+## Experimental PAL active-video overlay from Chromium
+
+This feature is **not yet hardware-verified**. The original compiled engine is backed up before the experimental replacement. It needs the tested `/dev/dri/card2` setup, a running `virtual-display.service`, and Xvfb on `:99`.
+
+The optional bridge uses `XGetImage` at up to 25 captures per second. It writes Chromium/Xvfb RGB pixels to PAL framebuffer lines **32–607** and preserves the existing Teletext VBI packet renderer on lines **0–31**. It does not let Xvfb own the physical DRM card.
+
+### Build and activate
+
+```bash
+cd ~/pi-teletext-modulator
+git pull --ff-only origin main
+systemctl is-active virtual-display chromium-kiosk teletext
+sudo bash scripts/setup-pal-overlay.sh
+sudo systemctl restart teletext.service
+```
+
+The build runs in a **temporary copy** of the upstream C sources, leaving your working source untouched. It copies the old binary to `/opt/pi-teletext-modulator/upstream/raspi5-teletext/teletext.before-x11-overlay` before replacing it. Check `sudo journalctl -u teletext.service -n 80 --no-pager` if the service fails.
+
+Test both the visible PAL image and Teletext page 100. Use noVNC over SSH to navigate Chromium; image changes should appear on the analog output. VBI and video were independently implemented but timing/visual quality on real TVs needs confirmation.
+
+### Roll back
+
+```bash
+sudo systemctl stop teletext.service
+sudo cp -a /opt/pi-teletext-modulator/upstream/raspi5-teletext/teletext.before-x11-overlay /opt/pi-teletext-modulator/upstream/raspi5-teletext/teletext
+sudo systemctl start teletext.service
+```
+
+Do not remove the working executable backup until the experimental overlay has been verified on hardware.
+
+### Caveats
+
+- Root-run `teletext.service` must be able to connect to local Xvfb `:99`; X11 authorization requirements can vary. An unavailable X display leaves PAL's active picture black while the Teletext VBI renderer continues.
+- The overlay is written for Xvfb's default 24-bit TrueColor mode and does CPU-based pixel capture/conversion. Scaling, PAL colour quality, and performance need testing on a physical receiver.
+- Your physical composite connector must continue to be controlled by only one DRM master (the Teletext process).
+- This is an optional *renderer build*, not a complete one-command clean-OS installer.
