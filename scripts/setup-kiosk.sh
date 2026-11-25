@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Set up a virtual display and loopback-only noVNC endpoint.
-# Does NOT route Chromium pixels into PAL video; compositor integration pending.
+# The separate optional PAL overlay renderer can capture this Xvfb screen.
 set -Eeuo pipefail
 [[ "${EUID}" -eq 0 ]] || { echo "Run as root with sudo" >&2; exit 1; }
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -35,4 +35,4 @@ echo "Virtual Chromium desktop: :99, 720x576"
 echo "NoVNC binds to 127.0.0.1 ONLY (no public VNC port)."
 echo "On your PC: ssh -L 6080:127.0.0.1:6080 $user@<pi-ip>"
 echo "Then open: http://localhost:6080/vnc.html"
-echo "NOTE: Chromium pixels are not yet composited into PAL video. Teletext remains independent."
+echo "For PAL output, use optional scripts/setup-pal-overlay.sh"\necho "For Chromium DAC+ audio, use scripts/setup-audio.sh"
