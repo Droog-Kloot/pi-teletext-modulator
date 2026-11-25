@@ -57,7 +57,8 @@ The TTI manager has a password but uses **unencrypted HTTP**. Keep it on a trust
 - [x] Recover TTI web manager
 - [ ] Reproducible version-locked RP1 VEC kernel-module build
 - [ ] Test PAL composite and live VBI Teletext on a clean image
-- [ ] Xvfb + Chromium kiosk + noVNC
+- [x] Add opt-in Xvfb + Chromium kiosk + loopback-only noVNC service templates (hardware testing pending)
+- [ ] Mix Xvfb's visible frames into the PAL active-video region without disturbing VBI
 - [ ] PipeWire + optional official Raspberry Pi DAC+
 - [ ] One-command interactive installer, update and uninstall scripts
 - [ ] Hardware-tested v1.0 release
