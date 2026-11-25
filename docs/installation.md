@@ -77,3 +77,33 @@ This adds a restart-on-failure broadcast service, using TTI pages in `/opt/pi-te
 If you see `drmModeSetCrtc: Permission denied`, check `sudo fuser -v /dev/dri/card2` for competing DRM masters such as `labwc` or a second teletext instance. Never run the manual demo alongside the service.
 
 The module currently needs to be manually rebuilt after kernel updates; rebooting into an unpatched kernel can break broadcasting.
+
+## Virtual Chromium desktop and noVNC (experimental)
+
+After the Teletext systemd broadcast is confirmed working, install a **separate Xvfb display** as a non-root desktop user:
+
+```bash
+cd ~/pi-teletext-modulator
+git pull --ff-only origin main
+sudo bash scripts/setup-kiosk.sh
+```
+
+This creates a 720×576 virtual X11 display on `:99`, launches Chromium as the invoking non-root user, and exposes its VNC display to **loopback-only** ports 5900/6080. It does *not* replace the PAL DRM owner and it does *not yet* place Chromium pixels in the PAL video picture.
+
+To access noVNC from your PC, create an SSH tunnel:
+
+```bash
+ssh -L 6080:127.0.0.1:6080 admin@modulator-pi5
+```
+
+Then open http://localhost:6080/vnc.html . Keep the tunnel open while browsing.
+
+Check status:
+
+```bash
+systemctl status virtual-display chromium-kiosk chromium-vnc chromium-novnc teletext --no-pager
+```
+
+The next feature is integrating virtual X11 pixel capture into the PAL scanout framebuffer **without touching the VBI rows**. Until this is implemented and tested, Chromium is available only through noVNC.
+
+**Security:** noVNC and x11vnc are deliberately bound to 127.0.0.1; do not remove loopback binding without adding authentication and TLS. The Xvfb virtual display is local to the Pi.
