@@ -40,3 +40,22 @@ Do not blindly apply an old `drm-rp1-vec.patch` against an arbitrary kernel. A m
 ## Security
 
 The reconstructed web manager is intended for a trusted LAN only; HTTP Basic authentication is not encryption. Do not expose port 8080 to the public internet.
+
+## Optional TTI manager service (LAN only)
+
+After successfully running `sudo bash install.sh --stage`, run:
+
+```bash
+sudo bash scripts/setup-web.sh
+```
+
+The script creates a dedicated `pi-teletext` system user, generates a random password once, and configures `teletext-web.service`. Save the displayed password securely. The login is `admin`. Access `http://<pi-ip>:8080` from your trusted LAN.
+
+**Important:** This service only manages TTI files, it does not transmit PAL/Teletext. The webpage uses HTTP without TLS; do not port-forward it. Existing credentials are preserved on repeat runs.
+
+Check logs:
+
+```bash
+sudo systemctl status teletext-web.service --no-pager
+sudo journalctl -u teletext-web.service -n 50 --no-pager
+```
