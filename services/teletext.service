@@ -5,6 +5,9 @@ Wants=systemd-udev-settle.service
 ConditionPathExists=/dev/dri/card2
 
 [Service]
+# Optional X11 overlay reads Chromium pixels from the virtual Xvfb screen.
+# Harmless for the original Teletext-only renderer.
+Environment=DISPLAY=:99
 Type=simple
 User=root
 WorkingDirectory=/opt/pi-teletext-modulator
