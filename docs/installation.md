@@ -144,3 +144,26 @@ Do not remove the working executable backup until the experimental overlay has b
 - The overlay is written for Xvfb's default 24-bit TrueColor mode and does CPU-based pixel capture/conversion. Scaling, PAL colour quality, and performance need testing on a physical receiver.
 - Your physical composite connector must continue to be controlled by only one DRM master (the Teletext process).
 - This is an optional *renderer build*, not a complete one-command clean-OS installer.
+
+## Optional Chromium audio via official Raspberry Pi DAC+
+
+On the working Pi 5, stereo playback from the green DAC+ was confirmed using ALSA, and Chromium playback via WirePlumber/PipeWire also worked. The ALSA card number is **not stable**; do not assume card 2 on other machines. The automated installer below is newly added and has not yet been tested on a fresh OS.
+
+First confirm the DAC+ is listed with `aplay -l`. If missing, check that `dtoverlay=rpi-dacplus` is present in `/boot/firmware/config.txt` and reboot after adding it. Preserve the existing composite-related overlay.
+
+With Chromium already set up, run:
+
+```bash
+cd ~/pi-teletext-modulator
+sudo bash scripts/setup-audio.sh
+wpctl status
+```
+
+The script installs PipeWire, PipeWire-Pulse and WirePlumber, enables linger for the Chromium user, starts its user audio services, and creates the persistent systemd drop-in `/etc/systemd/system/chromium-kiosk.service.d/20-pipewire.conf` containing `XDG_RUNTIME_DIR` and `PULSE_SERVER`. It restarts Chromium, **not** Teletext. Because the sink ID is specific to the system, select the DAC+ manually from `wpctl status`:
+
+```bash
+wpctl set-default <SINK_ID>
+wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.8
+```
+
+For diagnosis, run `wpctl status`, `pactl info`, and `systemctl --user status pipewire pipewire-pulse wireplumber`. The script does not automatically edit boot configuration or choose a possibly incorrect sound card.
