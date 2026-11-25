@@ -2,7 +2,7 @@
 
 **Experimental Raspberry Pi 5 PAL composite + real VBI Teletext project.**
 
-This repository is being reconstructed following the loss of the original Raspberry Pi SD card. It combines a Teletext encoder, a TTI page streamer, and a browser-based page manager. Planned additional components include Chromium kiosk output, noVNC remote control, and optional Raspberry Pi DAC+ audio.
+This repository is being reconstructed following the loss of the original Raspberry Pi SD card. It combines a Teletext encoder, a TTI page streamer, and a browser-based page manager. The working prototype combines Chromium kiosk output, noVNC remote control and Raspberry Pi DAC+ audio. A clean-OS installer still needs end-to-end verification.
 
 > **Status: v0.1.0-alpha (work in progress).** Do **not** run an unattended one-line installation yet: kernel-module patching and end-to-end installation have not been validated on a fresh Pi. The repository will distinguish tested features from planned work.
 
@@ -37,7 +37,7 @@ cd pi-teletext-modulator
 bash install.sh --check
 ```
 
-See [docs/installation.md](docs/installation.md) for the current limitations and recovery notes.
+See [docs/installation.md](docs/installation.md) for the experimental PAL overlay, audio setup and recovery notes.\n\nAfter configuring Chromium, the optional DAC+ audio integration can be installed with `sudo bash scripts/setup-audio.sh`. Choose the DAC+ WirePlumber sink using `wpctl status` and `wpctl set-default <SINK_ID>`.
 
 ## TTI streamer
 
@@ -58,8 +58,8 @@ The TTI manager has a password but uses **unencrypted HTTP**. Keep it on a trust
 - [ ] Reproducible version-locked RP1 VEC kernel-module build
 - [ ] Test PAL composite and live VBI Teletext on a clean image
 - [x] Add opt-in Xvfb + Chromium kiosk + loopback-only noVNC service templates (hardware testing pending)
-- [ ] Mix Xvfb's visible frames into the PAL active-video region without disturbing VBI
-- [ ] PipeWire + optional official Raspberry Pi DAC+
+- [x] Mix Xvfb's visible frames into the PAL active-video region without disturbing VBI (verified on project Pi)
+- [x] PipeWire + official Raspberry Pi DAC+ (verified on project Pi; automated setup not yet hardware-tested)
 - [ ] One-command interactive installer, update and uninstall scripts
 - [ ] Hardware-tested v1.0 release
 
