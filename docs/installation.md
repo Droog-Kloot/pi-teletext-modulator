@@ -59,3 +59,21 @@ Check logs:
 sudo systemctl status teletext-web.service --no-pager
 sudo journalctl -u teletext-web.service -n 50 --no-pager
 ```
+
+## TTI broadcast service (only after verified PAL Teletext test)
+
+After manually building the version-matched RP1 VEC module, activating PAL composite and verifying `sudo ./teletext` works, make sure the upstream `render.c` is configured for the actual PAL DRM card (this alpha script expects `/dev/dri/card2`). **Never assume card2 on another machine.**
+
+Stop any manual instance of `teletext`, update the repository, then:
+
+```bash
+sudo systemctl stop display-manager.service
+sudo bash scripts/setup-teletext.sh
+systemctl status teletext.service --no-pager
+```
+
+This adds a restart-on-failure broadcast service, using TTI pages in `/opt/pi-teletext-modulator/pages`, and checks that the expected composite connector exists. For headless boot (only after confirming SSH access), run `sudo systemctl set-default multi-user.target`.
+
+If you see `drmModeSetCrtc: Permission denied`, check `sudo fuser -v /dev/dri/card2` for competing DRM masters such as `labwc` or a second teletext instance. Never run the manual demo alongside the service.
+
+The module currently needs to be manually rebuilt after kernel updates; rebooting into an unpatched kernel can break broadcasting.
