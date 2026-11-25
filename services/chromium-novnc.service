@@ -1,0 +1,14 @@
+[Unit]
+Description=Pi Teletext Modulator - local noVNC WebSockets proxy
+Requires=chromium-vnc.service
+After=chromium-vnc.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/websockify --web /usr/share/novnc 127.0.0.1:6080 127.0.0.1:5900
+Restart=on-failure
+RestartSec=4
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
