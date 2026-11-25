@@ -1,0 +1,23 @@
+[Unit]
+Description=Pi Teletext Modulator - TTI web manager
+After=network.target
+
+[Service]
+Type=simple
+User=pi-teletext
+Group=pi-teletext
+WorkingDirectory=/opt/pi-teletext-modulator
+EnvironmentFile=/etc/pi-teletext-modulator/web.env
+ExecStart=/usr/bin/python3 /opt/pi-teletext-modulator/src/teletext_web.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/pi-teletext-modulator/pages
+CapabilityBoundingSet=
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target
