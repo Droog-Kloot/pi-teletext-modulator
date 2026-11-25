@@ -1,0 +1,14 @@
+[Unit]
+Description=Pi Teletext Modulator - virtual X11 display
+After=systemd-user-sessions.service
+Before=chromium-kiosk.service chromium-vnc.service
+
+[Service]
+Type=simple
+User=__USER__
+ExecStart=/usr/bin/Xvfb :99 -screen 0 720x576x24 -nolisten tcp -noreset
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
